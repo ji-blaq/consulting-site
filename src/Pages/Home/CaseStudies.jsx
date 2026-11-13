@@ -51,7 +51,7 @@ const CaseStudies = () => {
               Real results for real businesses
             </h2>
             <p className="mt-4 max-w-[52ch] text-[16px] leading-[1.7] text-stone">
-              A look at how we've helped clients across industries solve real
+              A look at how we’ve helped clients across industries solve real
               problems and grow with confidence.
             </p>
           </div>
@@ -64,7 +64,7 @@ const CaseStudies = () => {
           {caseStudies.map((study) => (
             <li
               key={study.client}
-              className="grid grid-cols-[2.4em_1fr] items-baseline gap-x-6 border-t border-line py-8 text-[44px] md:text-[60px]"
+              className="grid grid-cols-1 gap-y-3 border-t border-line py-8 text-[48px] sm:grid-cols-[2.4em_1fr] sm:items-baseline sm:gap-x-6 md:text-[60px]"
             >
               <p className="display leading-none text-forest">{study.figure}</p>
               <div>
