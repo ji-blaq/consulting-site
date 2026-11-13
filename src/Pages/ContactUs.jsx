@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PageHeader from "../Components/PageHeader";
 
 const faqs = [
   {
@@ -27,18 +28,74 @@ const faqs = [
   },
 ];
 
-const FaqItem = ({ q, a, isOpen, onClick }) => (
-  <div className="border-b border-slate-200 py-[16px]">
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full flex items-center justify-between text-left text-[15px] font-medium text-slate-900"
-    >
-      {q}
-      <span className="ml-[16px] text-teal-600">{isOpen ? "–" : "+"}</span>
-    </button>
+// Same details as the footer, so the site never contradicts itself
+const details = [
+  { label: "Email", value: "info@apexadvisory.com", href: "mailto:info@apexadvisory.com" },
+  { label: "Phone", value: "+1 (555) 123-4567", href: "tel:+15551234567" },
+  { label: "Office", value: "123 Business Ave, Suite 500, New York, NY 10001, USA" },
+  { label: "Hours", value: "Monday – Friday, 9 AM – 6 PM" },
+];
+
+const emptyForm = { name: "", email: "", phone: "", message: "" };
+
+const validate = (form) => {
+  const errors = {};
+  if (!form.name.trim()) errors.name = "Please tell us your name.";
+  if (!form.email.trim()) errors.email = "Please add your email so we can reply.";
+  else if (!/^\S+@\S+\.\S+$/.test(form.email)) errors.email = "That email doesn't look quite right.";
+  if (!form.message.trim()) errors.message = "Please add a short message.";
+  return errors;
+};
+
+const inputClass = (hasError) =>
+  `mt-2 w-full border-0 border-b bg-transparent px-0 py-3 text-[17px] text-ink placeholder:text-stone/60 focus:outline-none ${
+    hasError ? "border-red-700" : "border-ink/25 focus:border-forest"
+  }`;
+
+const Field = ({ id, label, optional, error, children }) => (
+  <div>
+    <label htmlFor={id} className="text-[14px] font-semibold text-ink">
+      {label}
+      {optional && <span className="font-normal text-stone"> (optional)</span>}
+    </label>
+    {children}
+    {error && (
+      <p id={`${id}-error`} className="mt-2 text-[14px] text-red-700">
+        {error}
+      </p>
+    )}
+  </div>
+);
+
+const FaqItem = ({ id, q, a, isOpen, onToggle }) => (
+  <div className="border-b border-ink/20">
+    <h3>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        aria-controls={`${id}-answer`}
+        className="flex w-full items-center justify-between gap-6 py-6 text-left"
+      >
+        <span className="display text-[22px] leading-[1.3] text-ink md:text-[26px]">
+          {q}
+        </span>
+        {/* plus that turns into a minus */}
+        <span aria-hidden="true" className="relative h-4 w-4 shrink-0 text-forest">
+          <span className="absolute left-0 top-1/2 h-[1.5px] w-4 -translate-y-1/2 bg-current" />
+          <span
+            className={`absolute left-1/2 top-0 h-4 w-[1.5px] -translate-x-1/2 bg-current transition-transform duration-300 ${
+              isOpen ? "scale-y-0" : "scale-y-100"
+            }`}
+          />
+        </span>
+      </button>
+    </h3>
     {isOpen && (
-      <p className="mt-[10px] text-[14px] leading-[24px] text-slate-600">
+      <p
+        id={`${id}-answer`}
+        className="max-w-[60ch] pb-6 text-[16px] leading-[1.7] text-stone"
+      >
         {a}
       </p>
     )}
@@ -46,194 +103,144 @@ const FaqItem = ({ q, a, isOpen, onClick }) => (
 );
 
 const ContactUs = () => {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
-  const [openFaq, setOpenFaq] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [errors, setErrors] = useState({});
+  const [sent, setSent] = useState(false);
+  const [openFaq, setOpenFaq] = useState(0);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    // clear a field's error as soon as the visitor fixes it
+    if (errors[name]) setErrors({ ...errors, [name]: undefined });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const found = validate(form);
+    setErrors(found);
 
-    if (!form.name || !form.email || !form.message) {
-      alert("Please fill in your name, email, and message.");
+    if (Object.keys(found).length > 0) {
+      setSent(false);
+      // move focus to the first field that needs fixing
+      document.getElementById(Object.keys(found)[0])?.focus();
       return;
     }
 
-    console.log(form);
-    setSubmitted(true);
-    setForm({ name: "", email: "", phone: "", message: "" });
-
-    setTimeout(() => setSubmitted(false), 4000);
+    // Concept site: no backend yet, so we just confirm on screen
+    setSent(true);
+    setForm(emptyForm);
   };
 
-  const leftFaqs = faqs.slice(0, Math.ceil(faqs.length / 2));
-  const rightFaqs = faqs.slice(Math.ceil(faqs.length / 2));
+  const describedBy = (field) => (errors[field] ? `${field}-error` : undefined);
 
   return (
     <>
-      {/* Header */}
-      <section className="w-full bg-white px-[60px] pt-[64px] pb-[48px] text-center">
-        <h1 className="text-[32px] font-semibold text-slate-900">
-          Contact & Support
-        </h1>
-        <p className="mt-[12px] max-w-[560px] mx-auto text-[15px] text-slate-600">
-          We're here to assist you. Whether it's inquiries, consultations, or
-          support, don't hesitate to reach out.
-        </p>
-      </section>
+      <PageHeader
+        eyebrow="Contact"
+        title="Let's talk about your business"
+        intro="Tell us what you're working on. A consultant will get back to you within one business day."
+      />
 
-      {/* Form + support info */}
-      <section className="w-full bg-white px-[60px] pb-[64px]">
-        <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[48px]">
+      <section className="page-x bg-white pb-20 md:pb-28">
+        <div className="container-x grid grid-cols-1 gap-16 border-t border-line pt-14 lg:grid-cols-12 lg:gap-12">
           {/* Form */}
-          <div className="rounded-xl border border-slate-200 p-[32px]">
-            <h2 className="text-[18px] font-semibold text-slate-900">
-              Get in Touch with Us
-            </h2>
-
-            <form onSubmit={handleSubmit} className="mt-[20px] flex flex-col gap-[16px]">
-              <div>
-                <label className="text-[13px] font-medium text-slate-700">
-                  Name *
-                </label>
+          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-8 lg:col-span-7">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+              <Field id="name" label="Name" error={errors.name}>
                 <input
-                  type="text"
+                  id="name"
                   name="name"
+                  type="text"
+                  autoComplete="name"
                   value={form.name}
                   onChange={handleChange}
+                  aria-invalid={!!errors.name}
+                  aria-describedby={describedBy("name")}
                   placeholder="Your name"
-                  className="mt-[6px] w-full border border-slate-300 rounded-md px-[14px] py-[10px] text-[14px] focus:border-teal-600 focus:outline-none"
+                  className={inputClass(errors.name)}
                 />
-              </div>
+              </Field>
 
-              <div>
-                <label className="text-[13px] font-medium text-slate-700">
-                  Email *
-                </label>
+              <Field id="email" label="Email" error={errors.email}>
                 <input
-                  type="email"
+                  id="email"
                   name="email"
+                  type="email"
+                  autoComplete="email"
                   value={form.email}
                   onChange={handleChange}
-                  placeholder="you@example.com"
-                  className="mt-[6px] w-full border border-slate-300 rounded-md px-[14px] py-[10px] text-[14px] focus:border-teal-600 focus:outline-none"
+                  aria-invalid={!!errors.email}
+                  aria-describedby={describedBy("email")}
+                  placeholder="you@company.com"
+                  className={inputClass(errors.email)}
                 />
-              </div>
+              </Field>
+            </div>
 
-              <div>
-                <label className="text-[13px] font-medium text-slate-700">
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
-                  placeholder="+1 (555) 000-0000"
-                  className="mt-[6px] w-full border border-slate-300 rounded-md px-[14px] py-[10px] text-[14px] focus:border-teal-600 focus:outline-none"
-                />
-              </div>
+            <Field id="phone" label="Phone" optional>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                value={form.phone}
+                onChange={handleChange}
+                placeholder="+1 (555) 000-0000"
+                className={inputClass(false)}
+              />
+            </Field>
 
-              <div>
-                <label className="text-[13px] font-medium text-slate-700">
-                  Message *
-                </label>
-                <textarea
-                  name="message"
-                  value={form.message}
-                  onChange={handleChange}
-                  placeholder="Leave us a message"
-                  rows={4}
-                  className="mt-[6px] w-full border border-slate-300 rounded-md px-[14px] py-[10px] text-[14px] focus:border-teal-600 focus:outline-none"
-                />
-              </div>
+            <Field id="message" label="How can we help?" error={errors.message}>
+              <textarea
+                id="message"
+                name="message"
+                rows={4}
+                value={form.message}
+                onChange={handleChange}
+                aria-invalid={!!errors.message}
+                aria-describedby={describedBy("message")}
+                placeholder="A few lines about your business and what you'd like to change"
+                className={`${inputClass(errors.message)} resize-none`}
+              />
+            </Field>
 
-                            <button
-                type="submit"
-                className="mt-[4px] bg-teal-600 rounded-md px-[24px] py-[12px] text-[15px] font-semibold text-white hover:bg-teal-700"
-              >
-                Send Message
+            <div className="flex flex-wrap items-center gap-6">
+              <button type="submit" className="btn-primary">
+                Send message
               </button>
 
-              {submitted && (
-                <p className="text-[14px] font-medium text-teal-700">
-                  Thanks — your message has been sent. We'll be in touch soon.
-                </p>
-              )}
-            </form>
-          </div>
-
-          {/* Support info */}
-          <div className="flex flex-col gap-[28px]">
-            <div>
-              <h3 className="text-[15px] font-semibold text-slate-900">
-                Chat to Support
-              </h3>
-              <p className="mt-[6px] text-[14px] text-slate-600">
-                Chat to our staff 24/7 for instant access to support.
-              </p>
-              <a href="/" className="mt-[6px] inline-block text-[14px] font-medium text-teal-700 underline">
-                Start Live Chat
-              </a>
-            </div>
-
-            <div>
-              <h3 className="text-[15px] font-semibold text-slate-900">
-                Call Us
-              </h3>
-              <p className="mt-[6px] text-[14px] text-slate-600">
-                Monday – Friday, 9:00 AM – 6:00 PM
-              </p>
-              <p className="mt-[4px] text-[14px] font-medium text-teal-700">
-                +1 (0)10 987 6543
-              </p>
-              <p className="text-[14px] font-medium text-teal-700">
-                +1 (0)10 987 6543
+              <p role="status" className="text-[15px] font-semibold text-forest">
+                {sent && "Thanks — your message is on its way. We'll be in touch within one business day."}
               </p>
             </div>
+          </form>
 
-            <div>
-              <h3 className="text-[15px] font-semibold text-slate-900">
-                Email Support
-              </h3>
-              <p className="mt-[6px] text-[14px] text-slate-600">
-                Email us & we will get back to you within 24 hours.
-              </p>
-              <p className="mt-[4px] text-[14px] font-medium text-teal-700">
-                support@apexadvisory.com
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-[15px] font-semibold text-slate-900">
-                Manchester, UK
-              </h3>
-              <p className="mt-[6px] text-[14px] text-slate-600">
-                Visit our office Monday – Friday, 9:00 AM – 6:00 PM
-              </p>
-              <p className="mt-[4px] text-[14px] text-slate-600">
-                123 Business Lane, Suite 100, Manchester, UK
-              </p>
-            </div>
-          </div>
+          {/* Details */}
+          <dl className="flex flex-col gap-8 lg:col-span-4 lg:col-start-9">
+            {details.map((item) => (
+              <div key={item.label} className="border-t border-line pt-5">
+                <dt className="text-[14px] font-semibold text-moss">{item.label}</dt>
+                <dd className="display mt-2 text-[22px] leading-[1.35] text-ink">
+                  {item.href ? (
+                    <a href={item.href} className="transition-colors hover:text-forest">
+                      {item.value}
+                    </a>
+                  ) : (
+                    item.value
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
-      </section>
 
-      {/* Map */}
-      <section className="w-full px-[60px] pb-[64px]">
-        <div className="max-w-[1200px] mx-auto h-[280px] rounded-xl overflow-hidden border border-slate-200">
+        {/* Map */}
+        <div className="container-x mt-16 h-[320px] overflow-hidden border border-line md:mt-20">
           <iframe
-            title="Office location map"
-            src="https://www.google.com/maps?q=Manchester,UK&output=embed"
-            className="h-full w-full"
+            title="Map showing our New York office"
+            src="https://www.google.com/maps?q=New+York,+NY+10001&output=embed"
+            className="h-full w-full grayscale"
             style={{ border: 0 }}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
@@ -242,34 +249,26 @@ const ContactUs = () => {
       </section>
 
       {/* FAQ */}
-      <section className="w-full bg-white px-[60px] pb-[80px] text-center">
-        <h2 className="text-[28px] font-semibold text-slate-900">
-          Frequently Asked Questions
-        </h2>
-        <p className="mt-[12px] text-[15px] text-slate-600">
-          Answers to common inquiries about our services.
-        </p>
-
-        <div className="mt-[40px] max-w-[900px] mx-auto grid grid-cols-1 sm:grid-cols-2 gap-x-[48px] text-left">
-          <div>
-            {leftFaqs.map((faq) => (
-              <FaqItem
-                key={faq.q}
-                q={faq.q}
-                a={faq.a}
-                isOpen={openFaq === faq.q}
-                onClick={() => setOpenFaq(openFaq === faq.q ? null : faq.q)}
-              />
-            ))}
+      <section className="page-x bg-mist py-20 md:py-28">
+        <div className="container-x grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
+          <div className="lg:col-span-4">
+            <h2 className="display text-[36px] leading-[1.08] text-ink md:text-[52px]">
+              Frequently asked questions
+            </h2>
+            <p className="mt-6 max-w-[34ch] text-[16px] leading-[1.7] text-stone">
+              Answers to the questions we hear most often.
+            </p>
           </div>
-          <div>
-            {rightFaqs.map((faq) => (
+
+          <div className="border-t border-ink/20 lg:col-span-7 lg:col-start-6">
+            {faqs.map((faq, i) => (
               <FaqItem
                 key={faq.q}
+                id={`faq-${i}`}
                 q={faq.q}
                 a={faq.a}
-                isOpen={openFaq === faq.q}
-                onClick={() => setOpenFaq(openFaq === faq.q ? null : faq.q)}
+                isOpen={openFaq === i}
+                onToggle={() => setOpenFaq(openFaq === i ? null : i)}
               />
             ))}
           </div>

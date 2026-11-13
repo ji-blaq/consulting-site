@@ -157,18 +157,10 @@ const Footer = () => {
       </form>
 
       <div className="container-x mt-10 flex flex-col items-start justify-between gap-3 text-[14px] text-stone sm:flex-row sm:items-center">
-        <p>© {new Date().getFullYear()} Consulting Firm. All rights reserved.</p>
-        <div className="flex gap-5">
-          <Link to="/privacy" className="hover:text-forest">
-            Privacy policy
-          </Link>
-          <Link to="/terms" className="hover:text-forest">
-            Terms & conditions
-          </Link>
-          <Link to="/cookies" className="hover:text-forest">
-            Cookie policy
-          </Link>
-        </div>
+        <p>© {new Date().getFullYear()} Apex Advisory. All rights reserved.</p>
+        <p>
+          A concept project designed and built by Oluwatimilehin Azeez Ajimati.
+        </p>
       </div>
     </footer>
   );

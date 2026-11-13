@@ -1,45 +1,5 @@
 import { Link } from "react-router-dom";
-
-// Each result is split into the headline figure and what it means,
-// so the figure can be set large.
-const caseStudies = [
-  {
-    client: "Tech Innovators Inc.",
-    industry: "Technology",
-    figure: "25%",
-    result: "increase in profitability within one year",
-  },
-  {
-    client: "Meridian Retail Group",
-    industry: "Retail",
-    figure: "2",
-    result: "new markets entered in under six months",
-  },
-  {
-    client: "Northbridge Health",
-    industry: "Healthcare",
-    figure: "18%",
-    result: "lower operational costs, with better patient outcomes",
-  },
-  {
-    client: "Harborview Financial",
-    industry: "Finance",
-    figure: "40%",
-    result: "faster loan processing after a workflow redesign",
-  },
-  {
-    client: "Atlas Manufacturing Co.",
-    industry: "Manufacturing",
-    figure: "22%",
-    result: "higher production throughput with leaner operations",
-  },
-  {
-    client: "Clearwater Public Services",
-    industry: "Government",
-    figure: "50%",
-    result: "shorter response times for citizen services",
-  },
-];
+import caseStudies from "../../data/caseStudies";
 
 const CaseStudies = () => {
   return (
@@ -51,7 +11,7 @@ const CaseStudies = () => {
               Real results for real businesses
             </h2>
             <p className="mt-4 max-w-[52ch] text-[16px] leading-[1.7] text-stone">
-              A look at how we've helped clients across industries solve real
+              A look at how we’ve helped clients across industries solve real
               problems and grow with confidence.
             </p>
           </div>
@@ -64,7 +24,7 @@ const CaseStudies = () => {
           {caseStudies.map((study) => (
             <li
               key={study.client}
-              className="grid grid-cols-[2.4em_1fr] items-baseline gap-x-6 border-t border-line py-8 text-[44px] md:text-[60px]"
+              className="grid grid-cols-1 gap-y-3 border-t border-line py-8 text-[48px] sm:grid-cols-[2.4em_1fr] sm:items-baseline sm:gap-x-6 md:text-[60px]"
             >
               <p className="display leading-none text-forest">{study.figure}</p>
               <div>
