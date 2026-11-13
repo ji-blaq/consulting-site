@@ -1,79 +1,85 @@
 import { Link } from "react-router-dom";
 
+// Each result is split into the headline figure and what it means,
+// so the figure can be set large.
 const caseStudies = [
   {
     client: "Tech Innovators Inc.",
     industry: "Technology",
-    result: "25% increase in profitability within one year",
+    figure: "25%",
+    result: "increase in profitability within one year",
   },
   {
     client: "Meridian Retail Group",
     industry: "Retail",
-    result: "Expanded into two new markets in under six months",
+    figure: "2",
+    result: "new markets entered in under six months",
   },
   {
     client: "Northbridge Health",
     industry: "Healthcare",
-    result: "Cut operational costs by 18% while improving patient outcomes",
+    figure: "18%",
+    result: "lower operational costs, with better patient outcomes",
   },
   {
     client: "Harborview Financial",
     industry: "Finance",
-    result: "Reduced loan processing time by 40% through workflow redesign",
+    figure: "40%",
+    result: "faster loan processing after a workflow redesign",
   },
   {
     client: "Atlas Manufacturing Co.",
     industry: "Manufacturing",
-    result: "Improved production throughput by 22% with leaner operations",
+    figure: "22%",
+    result: "higher production throughput with leaner operations",
   },
   {
     client: "Clearwater Public Services",
     industry: "Government",
-    result: "Modernized citizen services, cutting response times in half",
+    figure: "50%",
+    result: "shorter response times for citizen services",
   },
 ];
 
 const CaseStudies = () => {
   return (
-    <>
-      <section className="w-full bg-white px-[60px] pt-[64px] pb-[48px] text-center">
-        <p className="text-[14px] font-medium text-teal-700">Case Studies</p>
-        <h1 className="mt-[12px] text-[32px] font-semibold text-slate-900">
-          Real Results for Real Businesses
-        </h1>
-        <p className="mt-[12px] max-w-[640px] mx-auto text-[15px] text-slate-600">
-          A look at how we've helped clients across industries solve real
-          problems and grow with confidence.
-        </p>
-      </section>
-
-      <section className="w-full bg-slate-50 px-[60px] pb-[80px]">
-        <div className="max-w-[1200px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[32px]">
-          {caseStudies.map((study) => (
-            <div
-              key={study.client}
-              className="bg-white rounded-xl p-[32px] border border-slate-100"
-            >
-              <p className="text-[13px] font-medium text-teal-700">
-                {study.industry}
-              </p>
-              <h2 className="mt-[8px] text-[18px] font-semibold text-slate-900">
-                {study.client}
-              </h2>
-              <p className="mt-[12px] text-[15px] leading-[26px] text-slate-600">
-                {study.result}
-              </p>
-              <Link
-                to="/contact"
-                className="mt-[16px] inline-block text-[15px] font-medium text-teal-700 underline"
-              >
-                Read the Case Study
-              </Link>
-            </div>
-          ))}
+    <section className="page-x bg-mist py-20 md:py-28">
+      <div className="container-x">
+        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="display text-[36px] leading-[1.08] text-ink md:text-[52px]">
+              Real results for real businesses
+            </h2>
+            <p className="mt-4 max-w-[52ch] text-[16px] leading-[1.7] text-stone">
+              A look at how we’ve helped clients across industries solve real
+              problems and grow with confidence.
+            </p>
+          </div>
+          <Link to="/case-studies" className="text-link shrink-0 text-[15px]">
+            See all case studies
+          </Link>
         </div>
-      </section>
-    </>
+
+        <ul className="mt-12 grid grid-cols-1 gap-x-16 md:mt-16 md:grid-cols-2">
+          {caseStudies.map((study) => (
+            <li
+              key={study.client}
+              className="grid grid-cols-1 gap-y-3 border-t border-line py-8 text-[48px] sm:grid-cols-[2.4em_1fr] sm:items-baseline sm:gap-x-6 md:text-[60px]"
+            >
+              <p className="display leading-none text-forest">{study.figure}</p>
+              <div>
+                <p className="text-[17px] leading-[1.5] text-ink">
+                  {study.result}
+                </p>
+                <p className="mt-2 text-[14px] text-stone">
+                  {study.client}, {study.industry}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 };
 
