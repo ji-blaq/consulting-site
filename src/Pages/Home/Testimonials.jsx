@@ -3,7 +3,7 @@ import { useState } from "react";
 const testimonials = [
   {
     quote:
-      "Their strategic insights helped us streamline our operations and increase profitability by 25% within a year. We couldn’t have achieved such success without their expert guidance.",
+      "Their strategic insights helped us streamline our operations and increase profitability by 25% within a year. We couldn't have achieved such success without their expert guidance.",
     name: "Sarah Mitchell",
     role: "CEO, Tech Innovators Inc.",
   },
@@ -48,7 +48,7 @@ const Testimonials = () => {
   return (
     <section className="page-x bg-mist py-20 md:py-28">
       <div className="container-x grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
-        <div className="flex flex-row items-center justify-between gap-4 lg:col-span-3 lg:flex-col lg:items-start lg:justify-start lg:gap-6">
+        <div className="flex flex-row items-center justify-between gap-6 lg:col-span-3 lg:flex-col lg:items-start lg:justify-start">
           <h2 className="text-[17px] font-semibold text-ink">
             What our clients say
           </h2>
@@ -62,7 +62,7 @@ const Testimonials = () => {
             >
               <ArrowIcon flip />
             </button>
-            <p className="whitespace-nowrap text-center text-[14px] tabular-nums text-stone">
+            <p className="min-w-[3.5ch] text-center text-[14px] tabular-nums text-stone">
               {index + 1} of {testimonials.length}
             </p>
             <button
