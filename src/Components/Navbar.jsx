@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
-// Cropped version of logo.png without the empty space around the mark
-import Logo from "../assets/logo-mark.png";
+import Logo from "../assets/logo.png";
 
 const navItems = [
   { label: "Home", to: "/", end: true },
@@ -28,8 +27,13 @@ const Navbar = () => {
   return (
     <header className="page-x sticky top-0 z-50 border-b border-line bg-white/95 backdrop-blur">
       <div className="container-x relative flex h-[80px] items-center justify-between">
-        <Link to="/" onClick={close} className="flex items-center gap-3" aria-label="Apex Advisory, home">
-          <img src={Logo} alt="" className="h-11 w-auto" />
+        <Link
+          to="/"
+          onClick={close}
+          className="-ml-3 flex items-center gap-1"
+          aria-label="Apex Advisory, home"
+        >
+          <img src={Logo} alt="" className="h-16 w-16" />
           <span className="display text-[22px] leading-none text-ink">
             Apex Advisory
           </span>
