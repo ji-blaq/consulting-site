@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import PageHeader from "../Components/PageHeader";
+import slugify from "../utils/slugify";
 
 const services = [
   {
@@ -53,7 +54,12 @@ const ServiceCards = () => {
       <section className="page-x bg-white pb-20 md:pb-28">
         <ul className="container-x border-t border-line">
           {services.map((service, i) => (
-            <li key={service.title} className="border-b border-line">
+            <li
+              key={service.title}
+              // lets footer links like /services#risk-management jump straight here
+              id={slugify(service.title)}
+              className="scroll-mt-20 border-b border-line"
+            >
               <div className="group relative grid grid-cols-1 gap-4 py-10 md:grid-cols-12 md:gap-12 md:py-12">
                 {/* Green line that draws across the row on hover */}
                 <span

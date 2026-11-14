@@ -1,22 +1,9 @@
 import { Link } from "react-router-dom";
-import card1 from "../../assets/Card1.png";
+import insights from "../../data/insights";
 
-const lead = {
-  title: "Navigating financial challenges in uncertain times",
-  text: "Explore how to manage financial risk and optimize cash flow in a volatile economic climate.",
-  image: card1,
-};
-
-const more = [
-  {
-    title: "Transforming your business with data-driven decisions",
-    text: "Unlock the potential of data-driven decision-making to enhance your business performance.",
-  },
-  {
-    title: "How to improve client retention and build lasting relationships",
-    text: "Learn the essential strategies for retaining clients and growing your business through strong relationships.",
-  },
-];
+// First three articles: one lead story, two beside it
+const [lead, ...rest] = insights;
+const more = rest.slice(0, 2);
 
 const Insights = () => {
   return (
@@ -40,7 +27,7 @@ const Insights = () => {
         {/* Magazine layout: one lead story, two smaller ones beside it */}
         <div className="mt-12 grid grid-cols-1 gap-12 md:mt-16 lg:grid-cols-12">
           <article className="lg:col-span-7">
-            <Link to="/insights" className="group block">
+            <Link to={`/insights/${lead.slug}`} className="group block">
               <div className="overflow-hidden">
                 <img
                   src={lead.image}
@@ -52,7 +39,7 @@ const Insights = () => {
                 {lead.title}
               </h3>
               <p className="mt-3 max-w-[56ch] text-[16px] leading-[1.7] text-stone">
-                {lead.text}
+                {lead.excerpt}
               </p>
               <span className="text-link mt-5 inline-block text-[15px]">
                 Read the article
@@ -63,15 +50,15 @@ const Insights = () => {
           <div className="flex flex-col lg:col-span-5">
             {more.map((post, i) => (
               <article
-                key={post.title}
+                key={post.slug}
                 className={`border-line ${i === 0 ? "border-t pt-8 lg:border-t-0 lg:pt-0" : "mt-8 border-t pt-8"}`}
               >
-                <Link to="/insights" className="group block">
+                <Link to={`/insights/${post.slug}`} className="group block">
                   <h3 className="display text-[26px] leading-[1.2] text-ink transition-colors group-hover:text-forest">
                     {post.title}
                   </h3>
                   <p className="mt-3 text-[15px] leading-[1.7] text-stone">
-                    {post.text}
+                    {post.excerpt}
                   </p>
                   <span className="text-link mt-5 inline-block text-[15px]">
                     Read the article

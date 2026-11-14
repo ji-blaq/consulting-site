@@ -1,40 +1,50 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useToast } from "./toastContext";
+import SubscribeDialog from "./SubscribeDialog";
+import slugify from "../utils/slugify";
 
-// Each link now points at a real page instead of the home page
+// "Business strategy consulting" -> /services#business-strategy-consulting,
+// which opens the Services page scrolled to that service.
+const sectionLink = (page, label) => ({ label, to: `${page}#${slugify(label)}` });
+
 const columns = [
   {
     title: "Our services",
     links: [
-      { label: "Business strategy consulting", to: "/services" },
-      { label: "Financial advisory", to: "/services" },
-      { label: "Operational efficiency", to: "/services" },
-      { label: "IT & digital transformation", to: "/services" },
-      { label: "Risk management", to: "/services" },
+      sectionLink("/services", "Business strategy consulting"),
+      sectionLink("/services", "Financial advisory"),
+      sectionLink("/services", "Operational efficiency"),
+      sectionLink("/services", "IT & digital transformation"),
+      sectionLink("/services", "Risk management"),
       { label: "Explore all services", to: "/services" },
     ],
   },
   {
     title: "Industries",
     links: [
-      { label: "Technology", to: "/industries" },
-      { label: "Finance", to: "/industries" },
-      { label: "Healthcare", to: "/industries" },
-      { label: "Retail", to: "/industries" },
-      { label: "Manufacturing", to: "/industries" },
-      { label: "Government & public sector", to: "/industries" },
+      sectionLink("/industries", "Technology"),
+      sectionLink("/industries", "Finance"),
+      sectionLink("/industries", "Healthcare"),
+      sectionLink("/industries", "Retail"),
+      sectionLink("/industries", "Manufacturing"),
+      sectionLink("/industries", "Government & public sector"),
     ],
   },
   {
     title: "Company",
     links: [
       { label: "About us", to: "/about" },
-      { label: "Our team", to: "/about" },
+      { label: "Our team", to: "/about#team" },
       { label: "Case studies", to: "/case-studies" },
       { label: "Insights", to: "/insights" },
-      { label: "Careers", to: "/contact" },
+      // No careers page yet, so this shows a short message instead
+      { label: "Careers", soon: "We're working on our careers page. Check back soon." },
     ],
   },
 ];
+
+const isEmail = (value) => /^\S+@\S+\.\S+$/.test(value);
 
 // Small inline icons so we don't need an extra icon library
 const PhoneIcon = () => (
@@ -81,6 +91,29 @@ const socials = [
 ];
 
 const Footer = () => {
+  const showToast = useToast();
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [subscribedEmail, setSubscribedEmail] = useState("");
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    const value = email.trim();
+
+    if (!value) {
+      setError("Please enter your email address.");
+      return;
+    }
+    if (!isEmail(value)) {
+      setError("That email doesn't look quite right. Try name@company.com.");
+      return;
+    }
+
+    setError("");
+    setEmail("");
+    setSubscribedEmail(value); // opens the thank-you pop-up
+  };
+
   return (
     <footer className="page-x border-t border-line bg-white py-16 md:py-20">
       <div className="container-x grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -90,12 +123,22 @@ const Footer = () => {
             <ul className="mt-5 flex flex-col gap-3">
               {col.links.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    to={link.to}
-                    className="text-[15px] text-stone transition-colors hover:text-forest"
-                  >
-                    {link.label}
-                  </Link>
+                  {link.soon ? (
+                    <button
+                      type="button"
+                      onClick={() => showToast(link.soon)}
+                      className="text-left text-[15px] text-stone transition-colors hover:text-forest"
+                    >
+                      {link.label}
+                    </button>
+                  ) : (
+                    <Link
+                      to={link.to}
+                      className="text-[15px] text-stone transition-colors hover:text-forest"
+                    >
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -123,24 +166,28 @@ const Footer = () => {
           <h3 className="mt-8 text-[15px] font-semibold text-ink">Follow us</h3>
           <div className="mt-4 flex gap-3">
             {socials.map((s) => (
-              <a
+              <button
+                type="button"
                 key={s.name}
-                href="/"
-                aria-label={s.name}
+                onClick={() =>
+                  showToast(`We're working on our ${s.name} page. Check back soon.`)
+                }
+                aria-label={`${s.name} (coming soon)`}
                 className="flex h-[40px] w-[40px] items-center justify-center rounded-full border border-line text-ink transition-colors hover:border-forest hover:text-forest"
               >
                 <svg className="h-[16px] w-[16px]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path d={s.path} />
                 </svg>
-              </a>
+              </button>
             ))}
           </div>
         </div>
       </div>
 
       <form
-        className="container-x mt-14 flex flex-col gap-3 border-t border-line pt-10 sm:flex-row sm:items-center"
-        onSubmit={(e) => e.preventDefault()}
+        noValidate
+        onSubmit={handleSubscribe}
+        className="container-x mt-14 flex flex-col gap-3 border-t border-line pt-10 sm:flex-row sm:flex-wrap sm:items-center"
       >
         <label htmlFor="newsletter" className="text-[15px] font-semibold text-ink sm:mr-4">
           Get our insights by email
@@ -148,13 +195,33 @@ const Footer = () => {
         <input
           id="newsletter"
           type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (error) setError("");
+          }}
+          aria-invalid={!!error}
+          aria-describedby={error ? "newsletter-error" : undefined}
           placeholder="you@company.com"
-          className="w-full rounded-full border border-line bg-white px-5 py-3 text-[15px] text-ink placeholder:text-stone/70 focus:border-forest focus:outline-none sm:w-[320px]"
+          className={`w-full rounded-full border bg-white px-5 py-3 text-[15px] text-ink placeholder:text-stone/70 focus:outline-none sm:w-[320px] ${
+            error ? "border-red-700" : "border-line focus:border-forest"
+          }`}
         />
         <button type="submit" className="btn-primary py-3">
           Subscribe
         </button>
+        {error && (
+          <p id="newsletter-error" className="w-full text-[14px] text-red-700 sm:basis-full">
+            {error}
+          </p>
+        )}
       </form>
+
+      <SubscribeDialog
+        email={subscribedEmail}
+        onClose={() => setSubscribedEmail("")}
+      />
 
       <div className="container-x mt-10 flex flex-col items-start justify-between gap-3 text-[14px] text-stone sm:flex-row sm:items-center">
         <p>© {new Date().getFullYear()} Apex Advisory. All rights reserved.</p>

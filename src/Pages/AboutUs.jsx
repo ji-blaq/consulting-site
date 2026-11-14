@@ -121,8 +121,8 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Leadership */}
-      <section className="page-x bg-white pb-20 md:pb-28">
+      {/* Leadership – the footer's "Our team" link opens /about#team */}
+      <section id="team" className="page-x scroll-mt-16 bg-white pb-20 md:pb-28">
         <div className="container-x border-t border-line pt-20 md:pt-28">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-end">
             <h2 className="display text-[36px] leading-[1.08] text-ink md:text-[52px] lg:col-span-6">

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import PageHeader from "../Components/PageHeader";
+import slugify from "../utils/slugify";
 
 const industries = [
   {
@@ -48,7 +49,9 @@ const Industries = () => {
           {industries.map((industry, i) => (
             <li
               key={industry.title}
-              className="grid grid-cols-1 gap-5 border-b border-line py-10 md:grid-cols-12 md:gap-12 md:py-12"
+              // lets footer links like /industries#retail jump straight here
+              id={slugify(industry.title)}
+              className="scroll-mt-20 grid grid-cols-1 gap-5 border-b border-line py-10 md:grid-cols-12 md:gap-12 md:py-12"
             >
               <div className="flex items-baseline gap-5 md:col-span-5">
                 <span className="display text-[20px] text-moss">
